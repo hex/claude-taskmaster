@@ -1,0 +1,16 @@
+{
+  "name": "claude-taskmaster",
+  "version": "2026.3.0",
+  "description": "Completion guard that prevents Claude from stopping prematurely. Uses a Stop hook and TASKMASTER_DONE signal to enforce full task completion.",
+  "author": {
+    "name": "hex"
+  },
+  "keywords": [
+    "completion",
+    "guard",
+    "stop-hook",
+    "taskmaster",
+    "quality",
+    "persistence"
+  ]
+}

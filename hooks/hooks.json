@@ -1,0 +1,15 @@
+{
+  "description": "Taskmaster completion guard — blocks premature stopping until done signal is emitted",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/hooks/stop-check.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
