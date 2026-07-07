@@ -1,30 +1,38 @@
 ---
 name: taskmaster
 description: |
-  Completion guard that prevents premature stopping. Enforces an explicit
-  TASKMASTER_DONE::<session_id> signal before allowing the session to end.
-  This skill is enforced by a Stop hook — it activates automatically whenever
-  Claude tries to stop. Before stopping, verify: (1) the user's stated goal is
+  Completion guard that prevents premature stopping. Enforced by a Stop hook that
+  fires whenever Claude tries to stop, requiring an explicit
+  TASKMASTER_DONE::<session_id> signal as the final line of the final message
+  before a turn may end. Before stopping, verify: (1) the user's stated goal is
   fully achieved (yes/no, not "partially"), (2) every discrete request is FULLY
   done, (3) all tasks are completed, (4) all verification steps executed and
   passing, (5) no errors, TODOs, or loose ends remain. Do not narrate remaining
-  work — execute it. Progress is not completion. Use this skill proactively
-  whenever working on multi-step tasks, complex features, or any task where
-  premature stopping would waste the user's time.
+  work — execute it. Progress is not completion. The user's explicit instructions
+  to stop, skip, or descope always override this guard; if you need input only the
+  user can give, ask — don't stop. Use this skill proactively on multi-step tasks,
+  complex features, or any task where premature stopping would waste the user's time.
 ---
 
 # Taskmaster Completion Protocol
 
 ## Contract
 
-A session is complete ONLY when you emit this exact line on its own line:
+Your turn may end ONLY when you emit this exact line as the **final line of your
+final message**:
 
 ```
 TASKMASTER_DONE::<session_id>
 ```
 
-If you stop without this signal, the Stop hook will block you and you must
-continue working.
+Emitting this line is a factual claim that every item in the checklist below has
+passed. Emitting it when they have not is deceiving the user. Immediately before
+it, restate the goal verbatim and your "yes" from Goal Confrontation (§1). Never
+write this string in any other context — not in narration, not in examples. If
+you stop without it, the Stop hook blocks you and you must continue working.
+
+If you are genuinely blocked on something only the user can provide, do not fake
+completion — see §6 for the honest exit.
 
 ## Completion Checklist
 
@@ -39,10 +47,12 @@ Answer these questions explicitly in your response:
   "mostly", not "significant progress was made". Yes or no.
 - If no: you are NOT DONE. Keep working. The ONLY exception is if the user
   explicitly told you to stop or deprioritized the goal.
+- If you believe the stated goal is infeasible, say so to the user explicitly —
+  do not quietly substitute an easier goal you can satisfy.
 
-"Diminishing returns", "no single dominant hotspot", "would require broader
-architectural changes", or any variation of "I made good progress" are NOT
-valid reasons to stop. These are rationalizations.
+"Diminishing returns", "the remaining edge cases are unlikely in practice",
+"would require broader architectural changes", or any variation of "I made good
+progress" are NOT valid reasons to stop. These are rationalizations.
 
 ### 2. Request Verification
 
@@ -75,14 +85,27 @@ valid reasons to stop. These are rationalizations.
 
 ### 6. Blocker Resolution
 
-- If something is blocking you, do NOT give up.
-- You have access to a full development environment, a terminal, every tool
-  you need, and the internet. Try a different approach, read more code, search
-  for examples, re-examine your assumptions.
-- "I didn't cause this bug" is not an excuse to stop — if it blocks your
-  task, fix it. You own the outcome, not just your diff.
+- If something is blocking you, do NOT give up. Try a different approach, read
+  more code, search for examples, re-examine your assumptions. Attempt at least
+  two distinct approaches before concluding you are blocked.
+- "I didn't cause this bug" is not an excuse to stop — if it blocks your task,
+  fix it. You own the outcome, not just your diff.
+- If further progress genuinely requires something only the user can provide (a
+  credential, a decision between valid approaches, access you cannot obtain),
+  that is not quitting: ask via the **AskUserQuestion tool** — do NOT end your
+  turn to ask, the hook will block it.
+- If you have tried at least one alternative and are still hard-blocked on an
+  external barrier you cannot cross, name the exact barrier and what you
+  attempted, then end your final message with:
+  `TASKMASTER_BLOCKED::<session_id>`. That is an auditable blocker report, not a
+  skip — honored only after at least one prior block.
 
 ## Critical Rules
+
+**USER PRIORITY.** The user's latest instructions always take priority — this
+rule overrides every rule above it. If the user said to stop, move on, or skip
+something, respect that; do not force completion of work the user no longer
+wants. If you need input only the user can provide, ask — don't stop.
 
 **DO NOT NARRATE — EXECUTE.** If incomplete work remains, your ONLY job is to
 DO that work right now. Do not describe what remains, analyze its complexity,
@@ -90,19 +113,12 @@ list dependencies, or ask for permission. Open files, write code, run commands,
 fix bugs. Act.
 
 **PROGRESS IS NOT COMPLETION.** "I improved X from 1345ms to 866ms" does not
-satisfy a goal of "<500ms". Describing remaining work with phrases like "would
-require deeper analysis" is narrating — not doing. If the goal is not met,
-keep working.
+satisfy a goal of "<500ms"; "most tests now pass" does not satisfy "all tests
+pass". Describing remaining work with phrases like "would require deeper
+analysis" is narrating — not doing. If the goal is not met, keep working.
 
-**HONESTY CHECK.** Before marking anything as "not possible" or "skipped", ask
-yourself: did you actually TRY? "I can't do X" is almost never true — what you
-mean is "I haven't tried X yet." Attempt it first.
-
-**USER PRIORITY.** The user's latest instructions always take priority. If the
-user said to stop, move on, or skip something, respect that — do not force
-completion of work the user no longer wants.
-
-## Configuration
-
-- `TASKMASTER_MAX` (env var, default `0`): Max stop-blocks before allowing
-  stop. `0` means unlimited — hook keeps firing until done signal is emitted.
+**HONESTY CHECK.** Before marking anything as "not possible" or "skipped": did
+you actually TRY, with at least two distinct approaches? If both failed on a hard
+external barrier — a missing credential, denied permission, a resource that does
+not exist — name the exact barrier and what you attempted, and surface it to the
+user. That is a blocker report, not a skip.
