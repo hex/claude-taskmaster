@@ -90,6 +90,9 @@ fi
 
 # Minimal block message — full checklist is in the taskmaster skill. Names both exits
 # (done / genuinely-blocked) because the skill body is not guaranteed to be loaded.
-REASON="${LABEL}: Completion signal not found. Re-read the user's original request and verify every item is FULLY done — not started, DONE. Do not narrate remaining work — execute it. When every item is verified done, end your final message with: ${DONE_SIGNAL}. If you are truly blocked on something only the user can provide, ask the user or emit ${BLOCKED_SIGNAL} instead of stopping."
+# The header matches the completion banner in the skill so both texts share one identity.
+HEADER="━━━━━━━━━━━ ◆ ${LABEL} ◆ ━━━━━━━━━━━"
+REASON="${HEADER}
+Completion signal not found. Re-read the user's original request and verify every item is FULLY done — not started, DONE. Do not narrate remaining work — execute it. When every item is verified done, end your final message with: ${DONE_SIGNAL}. If you are truly blocked on something only the user can provide, ask the user or emit ${BLOCKED_SIGNAL} instead of stopping."
 
 jq -n --arg reason "$REASON" '{ decision: "block", reason: $reason }'

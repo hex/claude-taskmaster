@@ -3,7 +3,7 @@ name: taskmaster
 description: |
   Completion guard that prevents premature stopping. Enforced by a Stop hook that
   fires whenever Claude tries to stop, requiring an explicit
-  TASKMASTER_DONE::<session_id> signal as the final line of the final message
+  TASKMASTER_DONE::<session_id> signal at the end of the final message
   before a turn may end. Before stopping, verify: (1) the user's stated goal is
   fully achieved (yes/no, not "partially"), (2) every discrete request is FULLY
   done, (3) all tasks are completed, (4) all verification steps executed and
@@ -18,18 +18,26 @@ description: |
 
 ## Contract
 
-Your turn may end ONLY when you emit this exact line as the **final line of your
-final message**:
+Your turn may end ONLY when your **final message ends with this completion
+banner**, emitted as a fenced code block with the signal as its last line:
 
 ```
+━━━━━━━━━━━━━━━━━━━━━━━━━ ◆ ━━━━━━━━━━━━━━━━━━━━━━━━━
+           T A S K M A S T E R  ·  D O N E
+━━━━━━━━━━━━━━━━━━━━━━━━━ ◆ ━━━━━━━━━━━━━━━━━━━━━━━━━
 TASKMASTER_DONE::<session_id>
 ```
 
-Emitting this line is a factual claim that every item in the checklist below has
-passed. Emitting it when they have not is deceiving the user. Immediately before
-it, restate the goal verbatim and your "yes" from Goal Confrontation (§1). Never
-write this string in any other context — not in narration, not in examples. If
-you stop without it, the Stop hook blocks you and you must continue working.
+The `TASKMASTER_DONE::<session_id>` line is the machine-read signal — reproduce
+it exactly, substituting the real session id. The three banner lines above it
+are presentation; keep them exactly as shown.
+
+Emitting the signal is a factual claim that every item in the checklist below
+has passed. Emitting it when they have not is deceiving the user. Immediately
+before the banner, restate the goal verbatim and your "yes" from Goal
+Confrontation (§1). Never write the signal string in any other context — not in
+narration, not in examples. If you stop without it, the Stop hook blocks you
+and you must continue working.
 
 If you are genuinely blocked on something only the user can provide, do not fake
 completion — see §6 for the honest exit.
