@@ -18,7 +18,7 @@ Adversarial-review hardening pass (cross-vendor council + three red-team lenses)
 
 ### Docs / prompt
 - Block message points at the **AskUserQuestion tool** (ending a turn to ask was itself blocked, causing a loop) and tells Claude to copy the session id from the block message (it has no other reliable source before the first block). The block label drops `/MAX` so the exact release threshold is not advertised.
-- README: corrected the overstated "honored only after at least one real retry" (a block is not a retry — the gate is `≥1 block`, and the two-approaches bar is honor-system); added a **"What it deliberately does NOT do"** section; documented the subagent-skip fail-open and the per-streak nature of `MAX`. Block message ~495 → ~635 chars (~88% below the upstream baseline).
+- README: corrected the overstated "honored only after at least one real retry" (a block is not a retry — the gate is `≥1 block`, and the two-approaches bar is honor-system); added a **"What it deliberately does NOT do"** section and an end-to-end **walkthrough** (block → continue → done, plus the honest blocked-exit); documented the subagent-skip fail-open and the per-streak nature of `MAX`. Block message ~495 → ~635 chars (~88% below the upstream baseline).
 
 ## 2026.7.1
 

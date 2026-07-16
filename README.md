@@ -30,6 +30,39 @@ Block message, emitted by the hook when a stop attempt is rejected. The label om
 Completion signal not found. Re-read the user's original request and ...
 ```
 
+### Walkthrough: one task, start to finish
+
+A user asks: *"Add pagination to the users endpoint and cover it with tests."* Claude implements the endpoint, then tries to end its turn with the tests still unwritten:
+
+```
+Claude → (attempts to stop)
+Hook   → ━━━━━━━━━━━ ◆ TASKMASTER (1) ◆ ━━━━━━━━━━━
+         Completion signal not found. Re-read the user's original request
+         and verify every item is FULLY done — not started, DONE. ...
+```
+
+The nudge re-anchors Claude on the *tests* half of the request. It writes them, runs the suite green, and only then ends its final message with the banner — whose last line is the signal the hook is waiting for:
+
+```
+Goal: "Add pagination to the users endpoint and cover it with tests." — achieved: yes.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━ ◆ ━━━━━━━━━━━━━━━━━━━━━━━━━
+           T A S K M A S T E R  ·  D O N E
+━━━━━━━━━━━━━━━━━━━━━━━━━ ◆ ━━━━━━━━━━━━━━━━━━━━━━━━━
+TASKMASTER_DONE::a1b2c3d4-...
+```
+
+The hook sees the signal as the exact last line and allows the stop.
+
+**When Claude is genuinely stuck** — say the task needs a staging API key it has no way to obtain — it doesn't loop or fake completion. After at least one real attempt it names the barrier and ends with the blocked signal instead, which the hook honors (and logs):
+
+```
+Blocked: the migration needs STAGING_DB_URL, which isn't in the env or any config I can read.
+I've checked .env, the secrets store, and the CI config. This needs a value only you can provide.
+
+TASKMASTER_BLOCKED::a1b2c3d4-...
+```
+
 ### Signals
 
 | Signal | Emitted by Claude | Effect |
@@ -49,11 +82,11 @@ Claude tries to stop
     v
 Stop hook fires (stop-check.sh)
     |
-    +-- Subagent (transcript < 20 lines)? -------------> allow stop
+    +-- Subagent (transcript < 20 lines, readable)? ---> allow stop
     |
-    +-- TASKMASTER_DONE in final message? -------------> allow stop
+    +-- TASKMASTER_DONE as last line of final msg? ----> allow stop
     |
-    +-- TASKMASTER_BLOCKED in final message (count≥1)? -> allow stop (logged)
+    +-- TASKMASTER_BLOCKED as last line (count≥1)? ----> allow stop (logged)
     |
     +-- TASKMASTER_MAX reached? -----------------------> allow stop
     |
