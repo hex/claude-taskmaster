@@ -2,10 +2,23 @@
 
 All notable changes to claude-taskmaster are documented here.
 
-## Unreleased
+## 2026.7.2
+
+Adversarial-review hardening pass (cross-vendor council + three red-team lenses). Closes several fail-open paths, tightens signal detection, and adds a completion banner. The plugin is now documented honestly as an attestation aid, not a verifier.
 
 ### Features
-- **Completion banner and block header.** The done signal is now emitted as the last line of a heavy-rule `T A S K M A S T E R · D O N E` banner, and the hook's block message opens with a matching `◆` header, giving both taskmaster texts one visual identity. Detection is unchanged — still a substring match on the final assistant message — the banner is presentation only. Block message grows from ~470 to ~495 chars.
+- **Completion banner and matching block header.** The done signal is emitted as the last line of a heavy-rule `T A S K M A S T E R · D O N E` banner, and the block message opens with a matching `◆` header, giving both texts one visual identity.
+
+### Fixes
+- **Substring bypass (high).** Detection matched the signal *anywhere* in the final message via `grep -Fq`, so a quoted, code-fenced, or narrated copy of the signal disarmed the guard mid-task. It now matches the **exact last non-empty line** — the banner is emitted bare (not in a code fence) so the signal is genuinely the final line.
+- **Corrupt-counter fail-open (high).** A non-numeric counter file aborted the script under `set -u` before it could emit a block, silently allowing the stop *and* leaving the corrupt value in place so every later stop that session also failed open. The counter and `TASKMASTER_MAX` are now validated numeric (bad values reset), fixing both this and the silent loss of the cost backstop on a mistyped `MAX`.
+- **Missing-`jq` and unreadable-transcript fail-opens (medium).** A missing `jq` binary silently disabled the whole hook; an existing-but-unreadable transcript was misread as a short subagent transcript and skipped. Both now fail closed (block).
+- **Stale prior-turn signal (medium).** When a turn ended on a tool call (empty `last_assistant_message`), the transcript fallback could reconstruct a *previous*, already-finished turn's done signal and allow the stop. The fallback is now scoped to assistant text after the last user turn.
+- **Cross-user `/tmp` collision (medium, Linux).** The counter dir is now per-user (`taskmaster-<uid>`), so another user owning `/tmp/taskmaster` can no longer make the counter write fail and block forever.
+
+### Docs / prompt
+- Block message points at the **AskUserQuestion tool** (ending a turn to ask was itself blocked, causing a loop) and tells Claude to copy the session id from the block message (it has no other reliable source before the first block). The block label drops `/MAX` so the exact release threshold is not advertised.
+- README: corrected the overstated "honored only after at least one real retry" (a block is not a retry — the gate is `≥1 block`, and the two-approaches bar is honor-system); added a **"What it deliberately does NOT do"** section; documented the subagent-skip fail-open and the per-streak nature of `MAX`. Block message ~495 → ~635 chars (~88% below the upstream baseline).
 
 ## 2026.7.1
 
