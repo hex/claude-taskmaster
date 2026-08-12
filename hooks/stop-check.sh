@@ -9,7 +9,7 @@ INPUT=$(cat)
 # If it is missing the plugin is misinstalled — fail CLOSED with an actionable block
 # rather than silently no-op, which would let every stop through undetected.
 if ! command -v jq >/dev/null 2>&1; then
-  printf '{"decision":"block","reason":"taskmaster: jq not found on PATH — cannot verify completion. Install jq or remove the taskmaster Stop hook."}\n'
+  printf '{"decision":"block","reason":"taskmaster: jq not found on PATH — cannot check the completion signal. Install jq or remove the taskmaster Stop hook."}\n'
   exit 0
 fi
 
@@ -117,8 +117,10 @@ LABEL="TASKMASTER (${NEXT})"
 # Minimal block message — full checklist is in the taskmaster skill. Names both exits
 # (done / genuinely-blocked) because the skill body is not guaranteed to be loaded.
 # The header matches the completion banner in the skill so both texts share one identity.
+# The attestation clause mirrors the skill's framing: saying so makes the model own
+# the claim rather than satisfy a checker — honest without advertising the guard as toothless.
 HEADER="━━━━━━━━━━━ ◆ ${LABEL} ◆ ━━━━━━━━━━━"
 REASON="${HEADER}
-Completion signal not found. Re-read the user's original request and verify every item is FULLY done — not started, DONE. Do not narrate remaining work — execute it. When every item is verified done, end your final message with this exact line (copy the session id from this message): ${DONE_SIGNAL}. If you need something only the user can provide, ask via the AskUserQuestion tool (ending your turn to ask will be blocked); if you have tried and are hard-blocked, end your final message with ${BLOCKED_SIGNAL}."
+Completion signal not found. Re-read the user's original request and verify every item is FULLY done — not started, DONE. Do not narrate remaining work — execute it. When every item is verified done, end your final message with this exact line (copy the session id from this message): ${DONE_SIGNAL}. Emitting it is your attestation; nothing here verifies the work. If you need something only the user can provide, ask via the AskUserQuestion tool (ending your turn to ask will be blocked); if you have tried and are hard-blocked, end your final message with ${BLOCKED_SIGNAL}."
 
 jq -n --arg reason "$REASON" '{ decision: "block", reason: $reason }'

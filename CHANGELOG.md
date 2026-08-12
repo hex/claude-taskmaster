@@ -2,6 +2,18 @@
 
 All notable changes to claude-taskmaster are documented here.
 
+## 2026.8.1
+
+Honesty pass on the model-facing text. The guard's behaviour is unchanged; what changed is that it stops describing itself as something it is not.
+
+### Fixes
+- **Block message no longer reads as a verification gate.** It now frames emitting the done signal as the model's own attestation and concedes the mechanism outright: *"Emitting it is your attestation; nothing here verifies the work."* The hook has only ever checked that the signal line is present — a prompt that implies otherwise invites the reader to trust it further than it earns. Reported by a peer session; their proposed wording ("this is a reminder, not a check") was declined because telling the model the guard is toothless spends the only lever the mechanism has, where ownership framing keeps it.
+- **The `jq`-missing block message claimed the same false authority** — "cannot verify completion" — contradicting the new clause in the same file. Now "cannot check the completion signal".
+- **The plugin manifest description claimed to "enforce full task completion".** It enforces signal emission; the README has disclaimed verification since 2026.7.2. The manifest now matches.
+
+### Docs
+- README block-message size updated (~700 chars, ~86% below the upstream ~5,094).
+
 ## 2026.7.2
 
 Adversarial-review hardening pass (cross-vendor council + three red-team lenses). Closes several fail-open paths, tightens signal detection, and adds a completion banner. The plugin is now documented honestly as an attestation aid, not a verifier.
