@@ -1,6 +1,6 @@
 {
   "name": "claude-taskmaster",
-  "version": "2026.8.1",
+  "version": "2026.8.2",
   "description": "Completion guard that prevents Claude from stopping prematurely. A Stop hook holds the turn open until Claude attests, via a TASKMASTER_DONE signal, that every item is done.",
   "author": {
     "name": "hex"

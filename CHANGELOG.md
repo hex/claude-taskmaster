@@ -2,6 +2,11 @@
 
 All notable changes to claude-taskmaster are documented here.
 
+## 2026.8.2
+
+### Features
+- **The block message now carries the full completion banner template.** Previously the banner lived only in the skill body, which loads rarely — in practice sessions recovered via the block message alone and could only ever produce the bare signal line. Since the session id reaches a model only through the block message, every done signal is necessarily preceded by at least one block; showing the banner there guarantees it is in context at the decision point. The template is explicitly marked "as plain text, NOT inside a code block" so the signal stays the exact last line under the anchored detector. Block message ~700 → ~900 chars (~82% below the upstream baseline).
+
 ## 2026.8.1
 
 Honesty pass on the model-facing text. The guard's behaviour is unchanged; what changed is that it stops describing itself as something it is not.

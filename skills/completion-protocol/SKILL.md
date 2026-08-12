@@ -33,8 +33,8 @@ inside a code block, so the signal is genuinely the final line):
 Only the final `TASKMASTER_DONE::<session_id>` line is read by the hook, and it
 is matched as the **exact last non-empty line** of your message. So:
 
-- Reproduce that line exactly, with the real session id. **The fully-formed
-  string appears in the hook's block message — copy the session id from there.**
+- Reproduce that line exactly, with the real session id. **The hook's block
+  message shows the fully-formed banner — copy it from there.**
 - The three ━/◆ lines above it are decorative; their exact width does not
   matter. Do not wrap the banner in a code fence, and write nothing after it.
 

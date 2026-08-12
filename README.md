@@ -2,7 +2,7 @@
 
 Completion guard plugin for Claude Code. Prevents Claude from stopping prematurely by enforcing an explicit done signal before allowing a turn to end.
 
-Inspired by [eyaltoledano/claude-taskmaster](https://github.com/eyaltoledano/claude-taskmaster), rebuilt and optimized for Claude Code's plugin system with a ~86% reduction in hook output (5,094 chars down to ~700 chars per block).
+Inspired by [eyaltoledano/claude-taskmaster](https://github.com/eyaltoledano/claude-taskmaster), rebuilt and optimized for Claude Code's plugin system with a ~82% reduction in hook output (5,094 chars down to ~900 chars per block).
 
 > **What this is — and isn't.** This is a completion *attestation* aid, not a completion *verifier*. It checks that Claude printed a done signal as the last line of its final message; it does not run your tests or inspect your diff. It raises friction against premature stopping for an honest-but-hasty model — it cannot stop a model that is determined to game it (anything with shell access can disable a client-side hook). Treat it as a behavioral brake, not a guarantee. See [What it deliberately does NOT do](#what-it-deliberately-does-not-do).
 
@@ -10,7 +10,7 @@ Inspired by [eyaltoledano/claude-taskmaster](https://github.com/eyaltoledano/cla
 
 1. **Stop hook** blocks every stop attempt unless a `TASKMASTER_DONE::<session_id>` signal is the **exact last non-empty line of Claude's final message** (the last line of the completion banner). Matching the last line — not a substring anywhere — is what stops a quoted or narrated copy of the signal from disarming the guard mid-task
 2. **Completion protocol skill** provides a 6-point checklist (goal confrontation, request verification, task list, plan verification, error check, blocker resolution) that Claude internalizes through the skill system
-3. The hook output is a minimal ~700-char nudge — the heavy lifting is done by the skill description which is always in Claude's context
+3. The hook output is a minimal ~900-char nudge — the heavy lifting is done by the skill description which is always in Claude's context
 
 ### What It Looks Like
 
@@ -141,7 +141,7 @@ Every block writes its reason — which contains the literal signal strings — 
 With unlimited blocking, a Claude that genuinely needs a credential or a user decision it cannot obtain has only two moves: loop forever, or emit a dishonest done signal. `TASKMASTER_BLOCKED::<session_id>` gives it an honest, auditable exit — honored only after ≥1 prior block, and logged. Note this is trust-based: a block is not proof of a genuine retry attempt, and the hook cannot verify that Claude actually tried two approaches (that bar lives in the skill). The finite default `TASKMASTER_MAX=20` is a cost backstop so a stuck loop cannot bill the user indefinitely; set `TASKMASTER_MAX=0` to restore unlimited blocking.
 
 **Why keep the nudge minimal?**
-The reactive block message is ~700 chars (~86% below the upstream ~5,094). It names both exits (done and blocked) and points at the AskUserQuestion tool, because the skill body is not guaranteed to be loaded on a given turn — but the detailed checklist stays in the skill, not the per-block output.
+The reactive block message is ~900 chars (~82% below the upstream ~5,094). It names both exits (done and blocked) and points at the AskUserQuestion tool, because the skill body is not guaranteed to be loaded on a given turn — but the detailed checklist stays in the skill, not the per-block output.
 
 **Why skip subagents?**
 Transcripts under 20 lines indicate subagent tasks (tool calls, searches). Blocking these would prevent agent parallelism from working. The line count is a coarse proxy — a short main session is skipped (a fresh first turn can fall under the guard) and a long subagent is not; a more robust subagent signal is a known follow-up. The skip only fires when the line count is actually readable: an existing-but-unreadable transcript falls through and blocks rather than being mistaken for a short one.
