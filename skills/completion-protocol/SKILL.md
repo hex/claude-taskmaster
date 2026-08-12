@@ -25,9 +25,9 @@ banner** — the last line of your whole message must be the signal. The banner
 looks like this (shown here fenced for display; emit it as plain text, NOT
 inside a code block, so the signal is genuinely the final line):
 
-    ━━━━━━━━━━━━━━━━━━━━━━━━━ ◆ ━━━━━━━━━━━━━━━━━━━━━━━━━
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
                T A S K M A S T E R  ·  D O N E
-    ━━━━━━━━━━━━━━━━━━━━━━━━━ ◆ ━━━━━━━━━━━━━━━━━━━━━━━━━
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     TASKMASTER_DONE::<session_id>
 
 Only the final `TASKMASTER_DONE::<session_id>` line is read by the hook, and it
@@ -35,7 +35,7 @@ is matched as the **exact last non-empty line** of your message. So:
 
 - Reproduce that line exactly, with the real session id. **The hook's block
   message shows the fully-formed banner — copy it from there.**
-- The three ━/◆ lines above it are decorative; their exact width does not
+- The three ━ lines above it are decorative; their exact width does not
   matter. Do not wrap the banner in a code fence, and write nothing after it.
 
 Emitting the signal is a factual claim that every item in the checklist below

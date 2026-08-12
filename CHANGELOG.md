@@ -2,6 +2,11 @@
 
 All notable changes to claude-taskmaster are documented here.
 
+## 2026.8.3
+
+### Docs
+- Banner rules are now solid heavy lines; the diamond glyph is gone from the completion banner, the block-message header, and every example.
+
 ## 2026.8.2
 
 ### Features
@@ -24,7 +29,7 @@ Honesty pass on the model-facing text. The guard's behaviour is unchanged; what 
 Adversarial-review hardening pass (cross-vendor council + three red-team lenses). Closes several fail-open paths, tightens signal detection, and adds a completion banner. The plugin is now documented honestly as an attestation aid, not a verifier.
 
 ### Features
-- **Completion banner and matching block header.** The done signal is emitted as the last line of a heavy-rule `T A S K M A S T E R · D O N E` banner, and the block message opens with a matching `◆` header, giving both texts one visual identity.
+- **Completion banner and matching block header.** The done signal is emitted as the last line of a heavy-rule `T A S K M A S T E R · D O N E` banner, and the block message opens with a matching heavy-rule header, giving both texts one visual identity.
 
 ### Fixes
 - **Substring bypass (high).** Detection matched the signal *anywhere* in the final message via `grep -Fq`, so a quoted, code-fenced, or narrated copy of the signal disarmed the guard mid-task. It now matches the **exact last non-empty line** — the banner is emitted bare (not in a code fence) so the signal is genuinely the final line.

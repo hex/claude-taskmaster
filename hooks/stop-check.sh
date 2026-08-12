@@ -122,12 +122,12 @@ LABEL="TASKMASTER (${NEXT})"
 # The full banner template is included because this message is the only text a session is
 # guaranteed to see (the skill body loads rarely); without it, hook-only recoveries can
 # only ever produce the bare signal line.
-HEADER="━━━━━━━━━━━ ◆ ${LABEL} ◆ ━━━━━━━━━━━"
+HEADER="━━━━━━━━━━━━━━ ${LABEL} ━━━━━━━━━━━━━━"
 REASON="${HEADER}
 Completion signal not found. Re-read the user's original request and verify every item is FULLY done — not started, DONE. Do not narrate remaining work — execute it. When every item is verified done, end your final message with this completion banner, as plain text, NOT inside a code block — the signal must be the exact last line:
-━━━━━━━━━━━━━━━━━━━━━━━━━ ◆ ━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
            T A S K M A S T E R  ·  D O N E
-━━━━━━━━━━━━━━━━━━━━━━━━━ ◆ ━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${DONE_SIGNAL}
 Emitting it is your attestation; nothing here verifies the work. If you need something only the user can provide, ask via the AskUserQuestion tool (ending your turn to ask will be blocked); if you have tried and are hard-blocked, end your final message with ${BLOCKED_SIGNAL}."
 

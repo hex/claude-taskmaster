@@ -17,16 +17,16 @@ Inspired by [eyaltoledano/claude-taskmaster](https://github.com/eyaltoledano/cla
 Completion banner, emitted by Claude when the checklist genuinely passes. It is written as plain text (not fenced) so the signal is the literal last line of the message:
 
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━ ◆ ━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
            T A S K M A S T E R  ·  D O N E
-━━━━━━━━━━━━━━━━━━━━━━━━━ ◆ ━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TASKMASTER_DONE::<session_id>
 ```
 
 Block message, emitted by the hook when a stop attempt is rejected. The label omits the max so the exact number of attempts that would release the guard is not advertised:
 
 ```
-━━━━━━━━━━━ ◆ TASKMASTER (1) ◆ ━━━━━━━━━━━
+━━━━━━━━━━━━━━ TASKMASTER (1) ━━━━━━━━━━━━━━
 Completion signal not found. Re-read the user's original request and ...
 ```
 
@@ -36,7 +36,7 @@ A user asks: *"Add pagination to the users endpoint and cover it with tests."* C
 
 ```
 Claude → (attempts to stop)
-Hook   → ━━━━━━━━━━━ ◆ TASKMASTER (1) ◆ ━━━━━━━━━━━
+Hook   → ━━━━━━━━━━━━━━ TASKMASTER (1) ━━━━━━━━━━━━━━
          Completion signal not found. Re-read the user's original request
          and verify every item is FULLY done — not started, DONE. ...
 ```
@@ -46,9 +46,9 @@ The nudge re-anchors Claude on the *tests* half of the request. It writes them, 
 ```
 Goal: "Add pagination to the users endpoint and cover it with tests." — achieved: yes.
 
-━━━━━━━━━━━━━━━━━━━━━━━━━ ◆ ━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
            T A S K M A S T E R  ·  D O N E
-━━━━━━━━━━━━━━━━━━━━━━━━━ ◆ ━━━━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 TASKMASTER_DONE::a1b2c3d4-...
 ```
 
