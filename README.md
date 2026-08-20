@@ -1,5 +1,13 @@
 # claude-taskmaster
 
+> **Retired 2026-08-20 — archived and read-only.**
+>
+> An audit of 585 real Stop-hook blocks across 74 transcripts (46 days) found the guard did not earn its cost: ~53% produced pure re-attestation with no tool call, and at most ~11% preceded an edit to a real project file — a generous ceiling, since some of those edits were busywork the block induced rather than work it rescued.
+>
+> The limitation is structural. A `Stop` hook receives the final assistant message and a transcript path, never the user's request in usable form, so it cannot distinguish "answered the question" from "abandoned the task". Six ways of gating on that distinction were tested and all six failed, including a model-based judge: given exactly the pair a Stop hook can see, it scored 46% on a balanced set — worse than a coin flip, which says the signal is absent from the input, not that the judge was too weak.
+>
+> The code works as documented and the design notes below still stand. Left up for reference; nothing further is planned.
+
 Completion guard plugin for Claude Code. Prevents Claude from stopping prematurely by enforcing an explicit done signal before allowing a turn to end.
 
 Inspired by [eyaltoledano/claude-taskmaster](https://github.com/eyaltoledano/claude-taskmaster), rebuilt and optimized for Claude Code's plugin system with a ~82% reduction in hook output (5,094 chars down to ~900 chars per block).
